@@ -1,6 +1,5 @@
 #!/usr/bin/env Rscript
 
-
 library("optparse")
 printf <- function(...) cat(sprintf(...))
 
@@ -33,6 +32,9 @@ library(ExomeDepth)
 #############################################################################
 ########### INPUT ARGUMENTS
 ############################################################################
+
+wd=getwd();
+
 file_samples='exome_depth.samples'
 file_bed=opt$bed 
 sample_name=opt$sample
@@ -72,5 +74,6 @@ aux_bam <- getBamCounts(bed.frame= mybed.hg19, bam.file= sample_bam)
 
 #bam_count[['bam2']] <- bam2[['bam2']]
 
+setwd(wd);
 save.image(file=paste(sample_bam,'.RData',sep=''))
 quit()
