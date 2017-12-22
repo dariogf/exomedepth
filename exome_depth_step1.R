@@ -8,7 +8,9 @@ option_list = list(
   make_option(c("-f", "--samples"), type="character", default=NULL, 
               help="samplelist", metavar="character"),
   make_option(c("-d", "--bed"), type="character", default=NULL, 
-              help="bed_file", metavar="character")
+              help="bed_file", metavar="character"),
+  make_option(c("-o", "--output"), type="character", default=NULL, 
+              help="output_file", metavar="character")
 ); 
 
 opt_parser = OptionParser(option_list=option_list);
@@ -21,9 +23,11 @@ if (is.null(opt$sample)){
 
 file_samples=opt$samples;
 file_bed=opt$bed;
+output_file=opt$output;
 
 cat(sprintf("Using samplefile: %s\n",file_samples));
 cat(sprintf("Using BED: %s\n",file_bed));
+cat(sprintf("Using output: %s\n",output_file));
 
 library(GenomicRanges)
 library(ExomeDepth)
@@ -93,5 +97,6 @@ ExomeCount.dafr <- as(my.counts[, colnames(my.counts)], 'data.frame') #dataframe
 #ExomeCount.mat <- as.matrix(ExomeCount.dafr[, grep(names(ExomeCount.dafr), pattern = 'B.*')]) #dataframe con la unión d
 #ExomeCount.mat <- as.matrix(ExomeCount.dafr[, grep(names(ExomeCount.dafr), pattern = '*.bam')]) #dataframe con la unión d
 
-save.image(file='base_data.RData')
+#save.image(file='base_data.RData')
+save(file=output_file,list="ExomeCount.dafr","my.exons.hg19.GRanges")
 quit()

@@ -67,13 +67,11 @@ mybed.hg19[,1] <- gsub(as.character(mybed.hg19[,1]),
                                    pattern = 'M',
                                    replacement = 'MT')
 
-#cat(mybed.hg19[,1])
-
 ## unimos bed y bam y crear objeto ExomeDepht #####
 aux_bam <- getBamCounts(bed.frame= mybed.hg19, bam.file= sample_bam)
 
 #bam_count[['bam2']] <- bam2[['bam2']]
 
 setwd(wd);
-save.image(file=paste(sample_bam,'.RData',sep=''))
+save(file=paste(basename(sample_bam),'.RData',sep=''),list="aux_bam")
 quit()

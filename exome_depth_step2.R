@@ -5,15 +5,17 @@ printf <- function(...) cat(sprintf(...))
 
 option_list = list(
   make_option(c("-s", "--sample"), type="character", default=NULL, 
-              help="sample name", metavar="character")
+              help="sample name", metavar="character"),
+  make_option(c("-r", "--rdata"), type="character", default=NULL, 
+              help="base_rdata", metavar="character")
 ); 
 
 opt_parser = OptionParser(option_list=option_list);
 opt = parse_args(opt_parser);
 
-if (is.null(opt$sample)){
+if (is.null(opt$sample) || is.null(opt$rdata)){
   print_help(opt_parser)
-  stop("At least one argument must be supplied (sample).\n", call.=FALSE)
+  stop("All options must be supplied (sample).\n", call.=FALSE)
 }
 
 
@@ -22,7 +24,8 @@ cat(sprintf("Using SAMPLE: %s\n",opt$sample));
 library(GenomicRanges)
 library(ExomeDepth)
 
-load('base_data.RData')
+#load('base_data.RData')
+load(opt$rdata)
 
 ExomeCount.mat <- as.matrix(ExomeCount.dafr[, grep(names(ExomeCount.dafr), pattern = '*.bam')]) #dataframe con la unión d
 
@@ -31,15 +34,17 @@ nsamples <- ncol(ExomeCount.mat)
 ### start looping over each sample
 #for (i in 1:nsamples) {
 
-i1=match(paste(opt$sample,"_exome_sorted.bam",sep=''),as.matrix(samples))
+#i1=match(paste(opt$sample,"_exome_sorted.bam",sep=''),as.matrix(samples))
 #i=match(paste(opt$sample,"_exome_sorted.bam",sep=''),names(as.data.frame(ExomeCount.mat[0,])))
 i=match(paste(gsub("-",".",opt$sample),"_exome_sorted.bam",sep=''),names(as.data.frame(ExomeCount.mat[0,])))
 
+#print(samples)
+print(names(as.data.frame(ExomeCount.mat[0,])))
 
-printf("Indice in name: %d, in data_table: %d",i1,i);
-if (i1 != i){
-	printf("ERROR sample %s: some other sample failed execution of step1",opt$sample);
-}
+printf("Indice  in data_table: %d",i);
+#if (i1 != i){
+#	printf("ERROR sample %s: some other sample failed execution of step1",opt$sample);
+#}
   #### Create the aggregate reference set for this sample
   my.choice <- select.reference.set (test.counts = ExomeCount.mat[,i],
                                      reference.counts = ExomeCount.mat[,-i],
