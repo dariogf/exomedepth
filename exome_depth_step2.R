@@ -54,6 +54,11 @@ printf("Indice  in data_table: %d",i);
   my.reference.selected <- apply(X = ExomeCount.mat[, my.choice$reference.choice, drop = FALSE],
                                  MAR = 1,
                                  FUN = sum)
+
+  #dump(my.reference.selected);
+  printf("Selected_refs: ");
+  my.choice$summary.stats["selected"];
+
   message('Now creating the ExomeDepth object')
   all.exons <- new('ExomeDepth',
                     test = ExomeCount.mat[,i],
