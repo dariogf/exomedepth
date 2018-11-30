@@ -7,7 +7,9 @@ option_list = list(
   make_option(c("-s", "--sample"), type="character", default=NULL, 
               help="sample name", metavar="character"),
   make_option(c("-r", "--rdata"), type="character", default=NULL, 
-              help="base_rdata", metavar="character")
+              help="base_rdata", metavar="character"),
+  make_option(c("-d", "--drops"), type="character", default=NULL, 
+              help="drops", metavar="character")
 ); 
 
 opt_parser = OptionParser(option_list=option_list);
@@ -27,6 +29,19 @@ library(ExomeDepth)
 #load('base_data.RData')
 load(opt$rdata)
 
+if (!is.null(opt$drops)){
+   if (file.exists(opt$drops)){
+
+	printf("Dropping control samples: %s\n",opt$drops);
+
+	#drops <- c("P2.9457_exome_sorted.bam","P2.9578_exome_sorted.bam", "P2.9572_exome_sorted.bam", "P2.9487_exome_sorted.bam")
+	#drops <- c(opt$drops)
+	drops = readLines(opt$drops)
+
+	ExomeCount.dafr<-ExomeCount.dafr[ , !(names(ExomeCount.dafr) %in% drops)]
+    }
+}
+
 ExomeCount.mat <- as.matrix(ExomeCount.dafr[, grep(names(ExomeCount.dafr), pattern = '*.bam')]) #dataframe con la unión d
 
 
@@ -41,7 +56,7 @@ i=match(paste(gsub("-",".",opt$sample),"_exome_sorted.bam",sep=''),names(as.data
 #print(samples)
 print(names(as.data.frame(ExomeCount.mat[0,])))
 
-printf("Indice  in data_table: %d",i);
+printf("Indice  in data_table: %d\n",i);
 #if (i1 != i){
 #	printf("ERROR sample %s: some other sample failed execution of step1",opt$sample);
 #}
@@ -51,13 +66,30 @@ printf("Indice  in data_table: %d",i);
 #                                     bin.length = (ExomeCount.dafr$end - ExomeCount.dafr$start)/1000,
                                       bin.length= ExomeCount.dafr$width)
 #                                     n.bins.reduced = 10000)
+  printf("my_choice.reference.choice: %s\n ",my.choice$reference.choice);
+
+  #my.choice <- c("P2.9576_exome_sorted.bam", "P2.9578_exome_sorted.bam", "P2.9572_exome_sorted.bam")
+
   my.reference.selected <- apply(X = ExomeCount.mat[, my.choice$reference.choice, drop = FALSE],
                                  MAR = 1,
                                  FUN = sum)
 
   #dump(my.reference.selected);
+  printf("my_choice: %s\n ",my.choice);
+
   printf("Selected_refs: ");
   my.choice$summary.stats["selected"];
+  
+  dt=my.choice$summary.stats
+  e=dt[dt$selected,]
+  m=as.matrix(e)
+  
+  fileConn<-file("references.txt","a")
+  writeLines(m[1], fileConn)
+  close(fileConn)
+
+ #  printf("my_reference: %s\n ",my.reference.selected);
+ # save.image(file='env.Rdata')
 
   message('Now creating the ExomeDepth object')
   all.exons <- new('ExomeDepth',
@@ -94,4 +126,3 @@ printf("Indice  in data_table: %d",i);
 #      cex.lab = 0.8,
 #      with.gene = TRUE)
 ## Plotting the gene data
-
